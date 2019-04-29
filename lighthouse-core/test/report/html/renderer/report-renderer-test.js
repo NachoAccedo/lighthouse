@@ -104,24 +104,62 @@ describe('ReportRenderer', () => {
       assert.ok(header.querySelector('.lh-scores-container'), 'contains score container');
     });
 
-    it('renders special score gauges after the mainstream ones', () => {
-      const container = renderer._dom._document.body;
-      const output = renderer.renderReport(sampleResults, container);
+    it('renders score gauges in this order: default, pwa, plugins', () => {
+      const sampleResultsCopy = JSON.parse(JSON.stringify(sampleResults));
+      sampleResultsCopy.categories['lighthouse-plugin-someplugin'] = {
+        id: 'lighthouse-plugin-someplugin',
+        title: 'Some Plugin',
+        auditRefs: [],
+      };
 
-      const indexOfFirstIrregularGauge = Array.from(output
+      const container = renderer._dom._document.body;
+      const output = renderer.renderReport(sampleResultsCopy, container);
+
+      const indexOfPwaGauge = Array.from(output
         .querySelectorAll('.lh-scores-header > a[class*="lh-gauge"]')).findIndex(el => {
         return el.matches('.lh-gauge--pwa__wrapper');
       });
 
+      const indexOfPluginGauge = Array.from(output
+        .querySelectorAll('.lh-scores-header > a[class*="lh-gauge"]')).findIndex(el => {
+        return el.matches('.lh-gauge__wrapper--plugin');
+      });
+
       const scoresHeaderElem = output.querySelector('.lh-scores-header');
+      assert.equal(scoresHeaderElem.children.length - 2, indexOfPwaGauge);
+      assert.equal(scoresHeaderElem.children.length - 1, indexOfPluginGauge);
+      assert(indexOfPluginGauge > indexOfPwaGauge);
+
       for (let i = 0; i < scoresHeaderElem.children.length; i++) {
         const gauge = scoresHeaderElem.children[i];
 
         assert.ok(gauge.classList.contains('lh-gauge__wrapper'));
-        if (i >= indexOfFirstIrregularGauge) {
+        if (i >= indexOfPluginGauge) {
+          assert.ok(gauge.classList.contains('lh-gauge__wrapper--plugin'));
+        } else if (i >= indexOfPwaGauge) {
           assert.ok(gauge.classList.contains('lh-gauge--pwa__wrapper'));
         }
       }
+    });
+
+    it('renders plugin score gauge', () => {
+      const sampleResultsCopy = JSON.parse(JSON.stringify(sampleResults));
+      sampleResultsCopy.categories['lighthouse-plugin-someplugin'] = {
+        id: 'lighthouse-plugin-someplugin',
+        title: 'Some Plugin',
+        auditRefs: [],
+      };
+      const container = renderer._dom._document.body;
+      const output = renderer.renderReport(sampleResultsCopy, container);
+      const scoresHeaderElem = output.querySelector('.lh-scores-header');
+
+      const gaugeCount = scoresHeaderElem.querySelectorAll('.lh-gauge').length;
+      const pluginGaugeCount =
+        scoresHeaderElem.querySelectorAll('.lh-gauge__wrapper--plugin').length;
+
+      // 5 core categories + the 1 plugin.
+      assert.equal(6, gaugeCount);
+      assert.equal(1, pluginGaugeCount);
     });
 
     it('should not mutate a report object', () => {
