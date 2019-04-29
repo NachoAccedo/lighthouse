@@ -65,8 +65,8 @@ class ReportUIFeatures {
     this._toggleDarkTheme = this._toggleDarkTheme.bind(this);
     this._updateStickyHeaderOnScroll = this._updateStickyHeaderOnScroll.bind(this);
     this._toggleMetricDescription = this._toggleMetricDescription.bind(this);
-    this._setupMetricDescriptionToggleListeners =
-      this._setupMetricDescriptionToggleListeners.bind(this);
+    this._setupMetricDescriptionToggleElements =
+      this._setupMetricDescriptionToggleElements.bind(this);
   }
 
   /**
@@ -89,7 +89,6 @@ class ReportUIFeatures {
     this._document.addEventListener('scroll', this._updateStickyHeaderOnScroll);
     window.addEventListener('resize', this._updateStickyHeaderOnScroll);
     this._setupMetricDescriptionToggleElements();
-    this._setupMetricDescriptionToggleListeners();
     const topbarLogo = this._dom.find('.lh-topbar__logo', this._document);
     topbarLogo.addEventListener('click', this._toggleDarkTheme);
   }
@@ -170,17 +169,16 @@ class ReportUIFeatures {
     this.metricDescriptionToggleEl =
       /** @type {HTMLInputElement} */ (this._dom.find('.lh-metrics-toggle input', this._document));
     this.metricAuditGroup = this._dom.find('.lh-audit-group--metrics', this._document);
-  }
 
-  _setupMetricDescriptionToggleListeners() {
-    const toggle = () => this.metricDescriptionToggleEl.click();
     this.metricDescriptionToggleEl.addEventListener('input', this._toggleMetricDescription);
+    const toggle = () => this.metricDescriptionToggleEl.click();
     for (const el of this._dom.findAll('.lh-metric', this._document)) {
       el.addEventListener('click', toggle);
     }
   }
 
   _toggleMetricDescription() {
+    this.metricDescriptionToggleEl.blur();
     const show = this.metricDescriptionToggleEl.checked;
     this.metricAuditGroup.classList.toggle('lh-audit-group--metrics__show-descriptions', show);
   }
