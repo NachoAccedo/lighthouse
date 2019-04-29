@@ -48,12 +48,8 @@ class ReportUIFeatures {
     this.stickyHeaderEl; // eslint-disable-line no-unused-expressions
     /** @type {HTMLElement} */
     this.highlightEl; // eslint-disable-line no-unused-expressions
-    /** @type {HTMLElement} */
+    /** @type {HTMLInputElement} */
     this.metricDescriptionToggleEl; // eslint-disable-line no-unused-expressions
-    /** @type {HTMLElement} */
-    this.metricDescriptionLessEl; // eslint-disable-line no-unused-expressions
-    /** @type {HTMLElement} */
-    this.metricDescriptionMoreEl; // eslint-disable-line no-unused-expressions
     /** @type {HTMLElement} */
     this.metricAuditGroup; // eslint-disable-line no-unused-expressions
 
@@ -171,23 +167,22 @@ class ReportUIFeatures {
   }
 
   _setupMetricDescriptionToggleElements() {
-    this.metricDescriptionToggleEl = this._dom.find('.lh-metrics-toggle', this._document);
-    this.metricDescriptionMoreEl = this._dom.find('.lh-metrics-toggle-more', this._document);
-    this.metricDescriptionLessEl = this._dom.find('.lh-metrics-toggle-less', this._document);
+    this.metricDescriptionToggleEl =
+      /** @type {HTMLInputElement} */ (this._dom.find('.lh-metrics-toggle input', this._document));
     this.metricAuditGroup = this._dom.find('.lh-audit-group--metrics', this._document);
   }
 
   _setupMetricDescriptionToggleListeners() {
-    this.metricDescriptionToggleEl.addEventListener('click', this._toggleMetricDescription);
+    const toggle = () => this.metricDescriptionToggleEl.click();
+    this.metricDescriptionToggleEl.addEventListener('input', this._toggleMetricDescription);
     for (const el of this._dom.findAll('.lh-metric', this._document)) {
-      el.addEventListener('click', this._toggleMetricDescription);
+      el.addEventListener('click', toggle);
     }
   }
 
   _toggleMetricDescription() {
-    this.metricDescriptionMoreEl.classList.toggle('lh-metrics-toggle--active');
-    this.metricDescriptionLessEl.classList.toggle('lh-metrics-toggle--active');
-    this.metricAuditGroup.classList.toggle('lh-audit-group--metrics__show-descriptions');
+    const show = this.metricDescriptionToggleEl.checked;
+    this.metricAuditGroup.classList.toggle('lh-audit-group--metrics__show-descriptions', show);
   }
 
   /**
