@@ -588,6 +588,9 @@
   justify-content: center;
   padding: 2px 5px;
 }
+.lh-metrics-toggle input:focus + label {
+  outline: -webkit-focus-ring-color auto 3px;
+}
 .lh-metrics-toggle input:not(:checked) + label .lh-metrics-toggle-less,
 .lh-metrics-toggle input:checked + label .lh-metrics-toggle-more {
   background-color: var(--color-blue);
