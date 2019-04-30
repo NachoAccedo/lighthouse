@@ -65,8 +65,6 @@ class ReportUIFeatures {
     this._toggleDarkTheme = this._toggleDarkTheme.bind(this);
     this._updateStickyHeaderOnScroll = this._updateStickyHeaderOnScroll.bind(this);
     this._toggleMetricDescription = this._toggleMetricDescription.bind(this);
-    this._setupMetricDescriptionToggleElements =
-      this._setupMetricDescriptionToggleElements.bind(this);
   }
 
   /**
@@ -166,10 +164,12 @@ class ReportUIFeatures {
   }
 
   _setupMetricDescriptionToggleElements() {
-    this.metricDescriptionToggleEl =
-      /** @type {HTMLInputElement} */ (this._dom.find('.lh-metrics-toggle input', this._document));
-    this.metricAuditGroup = this._dom.find('.lh-audit-group--metrics', this._document);
+    const metricDescriptionToggleEl = this._document.querySelector('.lh-metrics-toggle__input');
+    // No metrics if performance category wasn't run.
+    if (!metricDescriptionToggleEl) return;
 
+    this.metricDescriptionToggleEl = /** @type {HTMLInputElement} */ (metricDescriptionToggleEl);
+    this.metricAuditGroup = this._dom.find('.lh-audit-group--metrics', this._document);
     this.metricDescriptionToggleEl.addEventListener('input', this._toggleMetricDescription);
     const toggle = () => this.metricDescriptionToggleEl.click();
     for (const el of this._dom.findAll('.lh-metric', this._document)) {
